@@ -53,7 +53,7 @@
         msg.textContent = "That email doesn't look right. Check it and try again.";
         return;
       }
-      if (form.website.value) { msg.textContent = ok; return; } // bot filled the hidden field
+      if (document.getElementById("website").value) { msg.textContent = ok; return; } // bot filled the hidden field
       if (!/^https:\/\//.test(form.getAttribute("action") || "")) {
         msg.textContent = "Sign-up opens very soon. Please try again in a few days.";
         return;
@@ -67,6 +67,11 @@
           body: new FormData(form),
         });
         if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json().catch(() => ({}));
+        if (data.status === "failed") {
+          msg.textContent = (data.errors?.messages || [])[0] || "That didn't work. Check your email and try again.";
+          return;
+        }
         msg.textContent = ok;
         form.reset();
       } catch {
